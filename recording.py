@@ -1,18 +1,87 @@
-import sounddevice as sd
-import soundfile as sf
-from scipy.io.wavfile import write
+from pynput import keyboard
+import pyaudio
+import wave
 import whisper
 
-fs = 44100  # Sample rate
-seconds = 4  # Duration of recording
+CHUNK = 8192
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+WAVE_OUTPUT_FILENAME = "output.wav"
 
-input("Press Enter to start recording...")
-myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
-sd.wait()  # Wait until recording is finished
-write('output.wav', fs, myrecording)  # Save as WAV file
-data, fs = sf.read('output.wav', dtype='float32')  
-# sd.play(data, fs)
-# status = sd.wait()  # Wait until file is done playing
-model = whisper.load_model("tiny")
-result = model.transcribe("output.wav", fp16=False)
-print(result["text"])
+p = pyaudio.PyAudio()
+
+class Recorder:
+    def __init__(self):
+        self.recording = False
+        
+
+    def start_recording(self):
+        if self.recording:
+            print("Already recording...")
+            return
+        self.frames = []
+        self.recording = True
+        self.stream = p.open(format=FORMAT, channels=CHANNELS,
+                             rate=RATE, input=True,
+                             frames_per_buffer=CHUNK,
+                             stream_callback=self.callback)
+        print("Recording...")
+        self.recording = True
+
+    def stop_recording(self):
+        if not self.recording:
+            print("Not recording...")
+            return
+        self.stream.stop_stream()
+        self.stream.close()
+        # p.terminate()
+        print("Finished recording.")
+        self.recording = False
+
+        with wave.open(WAVE_OUTPUT_FILENAME, 'wb') as wf:
+            wf.setnchannels(CHANNELS)
+            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setframerate(RATE)
+            wf.writeframes(b''.join(self.frames))
+
+    def callback(self, in_data, frame_count, time_info, status):
+        self.frames.append(in_data)
+        return (None, pyaudio.paContinue)
+    
+class Listener(keyboard.Listener):
+    def __init__(self, recorder):
+        super(Listener, self).__init__(self.on_press, self.on_release)
+        self.recorder = recorder
+
+    def on_press(self, key):
+        try:
+            if key.char == 'r':
+                self.recorder.start_recording()
+        except AttributeError:
+            pass
+
+    def on_release(self, key):
+        try:
+            if key.char == 'r':
+                self.recorder.stop_recording()
+        except AttributeError:
+            pass
+
+# input("Press Enter to start recording...")
+# myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+# sd.wait()  # Wait until recording is finished
+# write('output.wav', fs, myrecording)  # Save as WAV file
+# data, fs = sf.read('output.wav', dtype='float32')  
+# # sd.play(data, fs)
+# # status = sd.wait()  # Wait until file is done playing
+if __name__ == "__main__":
+    print("Press 'r' to start/stop recording...")
+    recorder = Recorder()
+    listener = Listener(recorder)
+    listener.start()
+    listener.join()
+
+    # model = whisper.load_model("tiny")
+    # result = model.transcribe("output.wav", fp16=False)
+    # print(result["text"])
