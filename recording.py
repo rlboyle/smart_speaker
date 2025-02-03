@@ -6,6 +6,7 @@ import whisper
 fs = 44100  # Sample rate
 seconds = 4  # Duration of recording
 
+input("Press Enter to start recording...")
 myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
 sd.wait()  # Wait until recording is finished
 write('output.wav', fs, myrecording)  # Save as WAV file
