@@ -5,6 +5,7 @@ from anthropic import Anthropic
 import sys
 
 def text_to_speech(text):
+    print(text)
     os.system(f"espeak \"{text}\"")
 
 if __name__ == "__main__":
@@ -15,7 +16,7 @@ if __name__ == "__main__":
             prompt = input("Say something: ")
             message = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
-                max_tokens=1024,
+                max_tokens=256,
                 system="You are a helpful smart speaker assistant named Garth. You can assist with my questions and are always positive",
                 messages=[
                     {"role": "user", "content": prompt}
