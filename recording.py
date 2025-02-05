@@ -10,6 +10,7 @@ RATE = 44100
 WAVE_OUTPUT_FILENAME = "output.wav"
 
 p = pyaudio.PyAudio()
+model = whisper.load_model("tiny")
 
 class Recorder:
     def __init__(self):
@@ -18,7 +19,7 @@ class Recorder:
 
     def start_recording(self):
         if self.recording:
-            print("Already recording...")
+            # print("Already recording...")
             return
         self.frames = []
         self.recording = True
@@ -31,7 +32,7 @@ class Recorder:
 
     def stop_recording(self):
         if not self.recording:
-            print("Not recording...")
+            # print("Not recording...")
             return
         self.stream.stop_stream()
         self.stream.close()
@@ -45,6 +46,9 @@ class Recorder:
             wf.setframerate(RATE)
             wf.writeframes(b''.join(self.frames))
 
+        result = model.transcribe("output.wav", fp16=False)
+        print(result["text"])
+
     def callback(self, in_data, frame_count, time_info, status):
         self.frames.append(in_data)
         return (None, pyaudio.paContinue)
@@ -56,14 +60,14 @@ class Listener(keyboard.Listener):
 
     def on_press(self, key):
         try:
-            if key.char == 'r':
+            if key == keyboard.Key.shift:
                 self.recorder.start_recording()
         except AttributeError:
             pass
 
     def on_release(self, key):
         try:
-            if key.char == 'r':
+            if key == keyboard.Key.shift:
                 self.recorder.stop_recording()
         except AttributeError:
             pass
@@ -76,12 +80,8 @@ class Listener(keyboard.Listener):
 # # sd.play(data, fs)
 # # status = sd.wait()  # Wait until file is done playing
 if __name__ == "__main__":
-    print("Press 'r' to start/stop recording...")
+    print("Press shift to start/stop recording...")
     recorder = Recorder()
     listener = Listener(recorder)
     listener.start()
     listener.join()
-
-    # model = whisper.load_model("tiny")
-    # result = model.transcribe("output.wav", fp16=False)
-    # print(result["text"])
