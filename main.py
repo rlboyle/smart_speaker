@@ -1,4 +1,3 @@
-# brew install espeak
 from dotenv import load_dotenv
 import os
 from anthropic import Anthropic
@@ -7,10 +6,22 @@ import sounddevice as sd
 import soundfile as sf
 from scipy.io.wavfile import write
 import whisper
+from gtts import gTTS
+import pyttsx3
 
 def text_to_speech(text):
     print(text)
-    os.system(f"espeak \"{text}\"")
+    # os.system(f"espeak \"{text}\"")
+    # os.system(f"say \"{text}\"") # say works for mac
+    # obj = gTTS(text=text, lang='en', slow=False)
+    # obj.save("output.mp3")
+    # os.system("mpg321 output.mp3") # mpg321 should work for raspberry pi
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[3].id) # change voice
+    engine.say(text)
+    engine.runAndWait()
+    
 
 if __name__ == "__main__":
     try:
