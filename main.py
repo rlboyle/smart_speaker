@@ -28,9 +28,13 @@ def text_to_speech(text):
     # os.system("mpg321 output.mp3") # mpg321 should work for raspberry pi
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[3].id) # change voice
+    engine.setProperty('voice', voices[14].id) # change voice
     engine.say(text)
-    engine.runAndWait()
+    # engine.runAndWait()
+    engine.startLoop(False)
+    engine.iterate()
+    engine.endLoop()
+    print("Hold shift to speak to Garth...")
     
 class Recorder:
     def __init__(self):
@@ -79,6 +83,7 @@ class Recorder:
                 ]
             )
         text_to_speech(message.content[0].text)
+        
 
 
     def callback(self, in_data, frame_count, time_info, status):
@@ -106,39 +111,13 @@ class Listener(keyboard.Listener):
 
 if __name__ == "__main__":
     try:
-        # fs = 44100  # Sample rate
-        # seconds = 4  # Duration of recording
         load_dotenv()
         client = Anthropic()
-        while True:
-            # input("Press Enter to talk to Garth...")
-            # myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
-            # sd.wait()  # Wait until recording is finished
-            # write('output.wav', fs, myrecording)  # Save as WAV file
-            # data, fs = sf.read('output.wav', dtype='float32')  
-            # # sd.play(data, fs)
-            # # status = sd.wait()  # Wait until file is done playing
-            # model = whisper.load_model("tiny")
-            # result = model.transcribe("output.wav", fp16=False)
-            # # print(result["text"])
-            # # prompt = input("Say something: ")
-            # message = client.messages.create(
-            #     model="claude-3-5-sonnet-20241022",
-            #     max_tokens=256,
-            #     system="""You are a helpful smart speaker assistant named Garth.
-            #         You assist me by answering my questions and are always positive. Be concise with you answers.""",
-            #     messages=[
-            #         {"role": "user", "content": result["text"]},
-            #     ]
-            # )
-            # text_to_speech(message.content[0].text)
-            # print(message.content[0].text)
-
-            print("Press shift to start/stop recording...")
-            recorder = Recorder()
-            listener = Listener(recorder)
-            listener.start()
-            listener.join()
+        print("Hold shift to speak to Garth...")
+        recorder = Recorder()
+        listener = Listener(recorder)
+        listener.start()
+        listener.join()
 
     except KeyboardInterrupt:
         print(f"\nExiting...")
