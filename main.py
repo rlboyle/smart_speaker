@@ -26,6 +26,7 @@ def text_to_speech(text):
     # obj = gTTS(text=text, lang='en', slow=False)
     # obj.save("output.mp3")
     # os.system("mpg321 output.mp3") # mpg321 should work for raspberry pi
+
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[14].id) # change voice
@@ -34,8 +35,11 @@ def text_to_speech(text):
     engine.startLoop(False)
     engine.iterate()
     engine.endLoop()
+    # tts = TTS()
+    # tts.speak(text)
+    # del(tts)
     print("Hold shift to speak to Garth...")
-    
+
 class Recorder:
     def __init__(self):
         self.recording = False
