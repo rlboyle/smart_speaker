@@ -9,13 +9,11 @@ CHANNELS = 1
 RATE = 44100
 WAVE_OUTPUT_FILENAME = "output.wav"
 
-p = pyaudio.PyAudio()
-model = whisper.load_model("tiny")
-
 class Recorder:
     def __init__(self):
         self.recording = False
-        
+        self.p = pyaudio.PyAudio()
+        self.model = whisper.load_model("tiny")
 
     def start_recording(self):
         if self.recording:
@@ -23,7 +21,7 @@ class Recorder:
             return
         self.frames = []
         self.recording = True
-        self.stream = p.open(format=FORMAT, channels=CHANNELS,
+        self.stream = self.p.open(format=FORMAT, channels=CHANNELS,
                              rate=RATE, input=True,
                              frames_per_buffer=CHUNK,
                              stream_callback=self.callback)
@@ -42,11 +40,11 @@ class Recorder:
 
         with wave.open(WAVE_OUTPUT_FILENAME, 'wb') as wf:
             wf.setnchannels(CHANNELS)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setsampwidth(self.p.get_sample_size(FORMAT))
             wf.setframerate(RATE)
             wf.writeframes(b''.join(self.frames))
 
-        result = model.transcribe("output.wav", fp16=False)
+        result = self.model.transcribe("output.wav", fp16=False)
         print(result["text"])
 
     def callback(self, in_data, frame_count, time_info, status):
