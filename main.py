@@ -81,7 +81,7 @@ class Recorder:
         if result["text"] != "" and result["text"] != " ":
             self.messages.append({"role": "user", "content": result["text"]})
             message = client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
+                    model="claude-3-5-sonnet-latest",
                     max_tokens=256,
                     system="""You are a helpful smart speaker assistant prototype named Garth.
                         You are running on a raspberry pi 4 with 4GB of ram and raspberry pi OS. You were written in python.
@@ -94,7 +94,7 @@ class Recorder:
             # print(message.content[0].text)
             text_to_speech(message.content[0].text)
             self.messages.append({"role": "assistant", "content": message.content[0].text})
-            if len(self.messages) > 10:
+            if len(self.messages) > 8:
                 self.messages.pop(0)
 
         else:
