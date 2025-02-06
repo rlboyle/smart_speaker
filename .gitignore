@@ -2,3 +2,4 @@
 .env
 output.wav
 output.mp3
+.DS_Store
