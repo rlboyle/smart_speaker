@@ -80,8 +80,11 @@ class Recorder:
         message = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=256,
-                system="""You are a helpful smart speaker assistant named Garth.
-                    You assist me by answering my questions and are always positive. Be concise with you answers.""",
+                system="""You are a helpful smart speaker assistant prototype named Garth.
+                    You are running on a raspberry pi 4 with 4GB of ram and raspberry pi OS. You were written in python.
+                    you are connected to a speaker and a microphone. You are connected to the internet.
+                    You were created for a senior design embedded systems capstone project by Ryan Boyle, Anna Murray, and Victoria Brown.
+                    You assist me by answering my questions and are always positive. Be concise and accurate with you answers.""",
                 messages=[
                     {"role": "user", "content": result["text"]},
                 ]
@@ -125,6 +128,3 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print(f"\nExiting...")
-    
-
-
