@@ -13,6 +13,7 @@ import pyaudio
 import wave
 import whisper
 
+
 CHUNK = 8192
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -38,13 +39,13 @@ def text_to_speech(text):
     # tts = TTS()
     # tts.speak(text)
     # del(tts)
-    print("Hold shift to speak to Garth...")
 
 class Recorder:
     def __init__(self):
         self.recording = False
         self.p = pyaudio.PyAudio()
         self.model = whisper.load_model("tiny")
+        self.messages = []
 
     def start_recording(self):
         if self.recording:
@@ -76,20 +77,30 @@ class Recorder:
             wf.writeframes(b''.join(self.frames))
 
         result = self.model.transcribe("output.wav", fp16=False)
-        # print(result["text"])
-        message = client.messages.create(
-                model="claude-3-5-sonnet-20241022",
-                max_tokens=256,
-                system="""You are a helpful smart speaker assistant prototype named Garth.
-                    You are running on a raspberry pi 4 with 4GB of ram and raspberry pi OS. You were written in python.
-                    you are connected to a speaker and a microphone. You are connected to the internet.
-                    You were created for a senior design embedded systems capstone project by Ryan Boyle, Anna Murray, and Victoria Brown.
-                    You assist me by answering my questions and are always positive. Be concise and accurate with you answers.""",
-                messages=[
-                    {"role": "user", "content": result["text"]},
-                ]
-            )
-        text_to_speech(message.content[0].text)
+        # print("sent message: m", result["text"], "m")
+        if result["text"] != "" and result["text"] != " ":
+            self.messages.append({"role": "user", "content": result["text"]})
+            message = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=256,
+                    system="""You are a helpful smart speaker assistant prototype named Garth.
+                        You are running on a raspberry pi 4 with 4GB of ram and raspberry pi OS. You were written in python.
+                        you are connected to a speaker and a microphone. You are connected to the internet.
+                        You were created for a senior design embedded systems capstone project by Ryan Boyle, Anna Murray, and Victoria Brown.
+                        You assist me by answering my questions and are always positive. Be concise and accurate with you answers.""",
+                    messages=self.messages
+                )
+        
+            # print(message.content[0].text)
+            text_to_speech(message.content[0].text)
+            self.messages.append({"role": "assistant", "content": message.content[0].text})
+            if len(self.messages) > 10:
+                self.messages.pop(0)
+
+        else:
+            text_to_speech("I didn't catch that. Could you repeat?")
+
+        print("Hold shift to speak to Garth...")
         
 
 
