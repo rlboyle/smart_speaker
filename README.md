@@ -67,7 +67,8 @@ touch .env
 echo "ANTHROPIC_API_KEY=your_API_key_here" >> .env
 ```
 
-## Run
+### Run
+Run main.py in your local python version
 ```bash
 python main.py
 ```
