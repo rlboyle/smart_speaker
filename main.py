@@ -4,7 +4,7 @@ from anthropic import Anthropic
 # import sys
 # import sounddevice as sd
 # import soundfile as sf
-from scipy.io.wavfile import write
+# from scipy.io.wavfile import write
 import whisper
 # from gtts import gTTS
 import pyttsx3
