@@ -1,12 +1,12 @@
 from dotenv import load_dotenv
-import os
+# import os
 from anthropic import Anthropic
-import sys
-import sounddevice as sd
-import soundfile as sf
+# import sys
+# import sounddevice as sd
+# import soundfile as sf
 from scipy.io.wavfile import write
 import whisper
-from gtts import gTTS
+# from gtts import gTTS
 import pyttsx3
 from pynput import keyboard
 import pyaudio
