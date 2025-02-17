@@ -11,7 +11,6 @@ import pyttsx3
 from pynput import keyboard
 import pyaudio
 import wave
-import whisper
 
 
 CHUNK = 8192
