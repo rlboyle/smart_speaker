@@ -9,7 +9,7 @@ import wave
 
 if __name__ == "__main__":
     load_dotenv()
-    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    client = Anthropic()
     model = whisper.load_model("tiny")
     user = input("Talk to Garth")
     message = client.messages.create(
