@@ -11,6 +11,7 @@ def text_to_speech(text):
     print(text)
     os.system(f"espeak \"{text}\"")
 
+# this works
 if __name__ == "__main__":
     try:
         fs = 44100  # Sample rate
