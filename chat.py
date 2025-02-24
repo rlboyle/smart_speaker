@@ -1,27 +1,44 @@
 from dotenv import load_dotenv
+import os
 from anthropic import Anthropic
+import sys
+import sounddevice as sd
+import soundfile as sf
+from scipy.io.wavfile import write
 import whisper
-# from gtts import gTTS
-# import pyttsx3
-# from pynput import keyboard
-import pyaudio
-import wave
+
+def text_to_speech(text):
+    print(text)
+    os.system(f"espeak \"{text}\"")
 
 if __name__ == "__main__":
-    load_dotenv()
-    client = Anthropic()
-    model = whisper.load_model("tiny")
-    prompt = input("Talk to Garth: ")
-    message = client.messages.create(
-                    model="claude-3-5-sonnet-latest",
-                    max_tokens=256,
-                    system="""You are a helpful smart speaker assistant prototype named Garth.
-                        You are an embedded system running on a raspberry pi 4 with 4GB of ram and raspberry pi OS. You were written in python.
-                        you are connected to a speaker and a microphone. You are connected to the internet.
-                        You were created for a senior design capstone project by Ryan Boyle, Anna Murray, and Victoria Brown at Northwestern University.
-                        You assist me by answering my questions and are always positive. Be concise and accurate with you answers.""",
-                        messages=[
-                            {"role": "user", "content": prompt}
-                        ]
-                )
-    print(message.content[0].text)
+    try:
+        fs = 44100  # Sample rate
+        seconds = 4  # Duration of recording
+        load_dotenv()
+        client = Anthropic()
+        while True:
+            input("Press Enter to talk to Garth...")
+            myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+            sd.wait()  # Wait until recording is finished
+            write('output.wav', fs, myrecording)  # Save as WAV file
+            data, fs = sf.read('output.wav', dtype='float32')  
+            # sd.play(data, fs)
+            # status = sd.wait()  # Wait until file is done playing
+            model = whisper.load_model("tiny")
+            result = model.transcribe("output.wav", fp16=False)
+            # print(result["text"])
+            # prompt = input("Say something: ")
+            message = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=256,
+                system="""You are a helpful smart speaker assistant named Garth.
+                    You assist me by answering my questions and are always positive. Be concise with you answers.""",
+                messages=[
+                    {"role": "user", "content": result["text"]},
+                ]
+            )
+            text_to_speech(message.content[0].text)
+            # print(message.content[0].text)
+    except KeyboardInterrupt:
+        print(f"\nExiting...")
