@@ -1,7 +1,7 @@
-# Smart Speaker
+# Smart Speaker: Garth
 
 ## Overview
-Smart Speaker is a virtual home assistant designed to provide information and assist with information.
+Garth is a virtual home assistant designed to provide information and assist with information.
 The current iteration runs on a laptop but we aim to run it on a Rasberry Pi 4 with an external microphone and speaker.
 The project uses Anthropic API to generate responses, Pyttsx3 for audio to text interpretation, and OpenAI Whisper to convert user speech to text.
 
@@ -9,7 +9,8 @@ The project uses Anthropic API to generate responses, Pyttsx3 for audio to text 
 
 ### Prerequisites
 
-Install the following:
+Install the following on your target device:  
+(Garth can run natively on a laptop or be deployed on a raspberry pi)
 - Git: [https://git-scm.com/](https://git-scm.com/)
 - Python 3.11: [https://git-scm.com/](https://git-scm.com/) (untested on other versions)
 
@@ -67,9 +68,14 @@ touch .env
 echo "ANTHROPIC_API_KEY=your_API_key_here" >> .env
 ```
 
-### Run
-Run main.py in your local python version
+### Run in Your Native Python Version
+To run natively on a laptop:
 ```bash
-python main.py
+python demo.py
 ```
+To deploy on a raspberry pi:
+```bash
+python chat.py
+```
+
 
