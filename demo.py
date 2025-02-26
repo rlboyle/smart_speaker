@@ -8,7 +8,8 @@ from anthropic import Anthropic
 import whisper
 # from gtts import gTTS
 import pyttsx3
-from pynput import keyboard
+# from pynput import keyboard
+import keyboard
 import pyaudio
 import wave
 
@@ -107,24 +108,37 @@ class Recorder:
         self.frames.append(in_data)
         return (None, pyaudio.paContinue)
     
-class Listener(keyboard.Listener):
-    def __init__(self, recorder):
-        super(Listener, self).__init__(self.on_press, self.on_release)
-        self.recorder = recorder
+# class Listener(keyboard.Listener):
+#     def __init__(self, recorder):
+#         super(Listener, self).__init__(self.on_press, self.on_release)
+#         self.recorder = recorder
 
-    def on_press(self, key):
-        try:
-            if key == keyboard.Key.shift:
-                self.recorder.start_recording()
-        except AttributeError:
-            pass
+#     def on_press(self, key):
+#         try:
+#             if event.name == '1':
+#                 self.recorder.start_recording()
+#         except AttributeError:
+#             pass
 
-    def on_release(self, key):
-        try:
-            if key == keyboard.Key.shift:
-                self.recorder.stop_recording()
-        except AttributeError:
-            pass
+#     def on_release(self, key):
+#         try:
+#             if key.char == '1':
+#                 self.recorder.stop_recording()
+#         except AttributeError:
+#             pass
+def on_key_press():
+    try:
+        if event.name == '1':
+            self.recorder.start_recording()
+    except AttributeError:
+        pass
+
+def on_key_release():
+    try:
+        if key.char == '1':
+            self.recorder.stop_recording()
+    except AttributeError:
+        pass
 
 if __name__ == "__main__":
     try:
@@ -132,9 +146,14 @@ if __name__ == "__main__":
         client = Anthropic()
         print("Hold shift to speak to Garth...")
         recorder = Recorder()
-        listener = Listener(recorder)
-        listener.start()
-        listener.join()
+        # listener = Listener(recorder)
+        # listener.start()
+        # listener.join()
+        keyboard.on_press(on_key_press)
+        keyboard.on_release(on_key_release)
+
+        # Block forever (until Ctrl+C)
+        keyboard.wait()
 
     except KeyboardInterrupt:
         print(f"\nExiting...")
