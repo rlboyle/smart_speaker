@@ -8,6 +8,8 @@ from scipy.io.wavfile import write
 import whisper
 import pyttsx3
 
+# to run: sudo /home/garth/Documents/garth/venv/bin/python /home/garth/Documents/garth/demo.py
+
 # def text_to_speech(text):
 #     print(text)
 #     os.system(f"espeak \"{text}\"")

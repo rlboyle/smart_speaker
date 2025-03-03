@@ -32,10 +32,10 @@ def text_to_speech(text):
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[14].id) # change voice
     engine.say(text)
-    # engine.runAndWait()
-    engine.startLoop(False)
-    engine.iterate()
-    engine.endLoop()
+    engine.runAndWait()
+    # engine.startLoop(False)
+    # engine.iterate()
+    # engine.endLoop()
     # tts = TTS()
     # tts.speak(text)
     # del(tts)
@@ -126,19 +126,30 @@ class Recorder:
 #                 self.recorder.stop_recording()
 #         except AttributeError:
 #             pass
-def on_key_press():
+
+recorder = Recorder()
+
+def on_key_press(event):
+    # print(f"key pressed: {event.name}")
     try:
         if event.name == '1':
-            self.recorder.start_recording()
+            recorder.start_recording()
     except AttributeError:
         pass
 
-def on_key_release():
+def on_key_release(event):
+    # print(f"key released: {event.name}")
     try:
-        if key.char == '1':
-            self.recorder.stop_recording()
+        if event.name == '1':
+            recorder.stop_recording()
     except AttributeError:
         pass
+
+def on_event(event):
+    if event.event_type == keyboard.KEY_DOWN:
+        on_key_press(event)
+    elif event.event_type == keyboard.KEY_UP:
+        on_key_release(event)
 
 if __name__ == "__main__":
     try:
@@ -149,8 +160,7 @@ if __name__ == "__main__":
         # listener = Listener(recorder)
         # listener.start()
         # listener.join()
-        keyboard.on_press(on_key_press)
-        keyboard.on_release(on_key_release)
+        keyboard.hook(on_event)
 
         # Block forever (until Ctrl+C)
         keyboard.wait()
