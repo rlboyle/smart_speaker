@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-# import os
+import os
 from anthropic import Anthropic
 # import sys
 # import sounddevice as sd
@@ -20,6 +20,10 @@ CHANNELS = 1
 RATE = 44100
 WAVE_OUTPUT_FILENAME = "output.wav"
 
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[14].id) # change voice
+
 def text_to_speech(text):
     print(text)
     # os.system(f"espeak \"{text}\"")
@@ -28,11 +32,13 @@ def text_to_speech(text):
     # obj.save("output.mp3")
     # os.system("mpg321 output.mp3") # mpg321 should work for raspberry pi
 
-    engine = pyttsx3.init()
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[14].id) # change voice
-    engine.say(text)
-    engine.runAndWait()
+    # engine = pyttsx3.init(driverName='espeak')
+    # voices = engine.getProperty('voices')
+    # engine.setProperty('voice', voices[14].id) # change voice
+    os.system("espeak \"{text}\"")
+    # engine.save_to_file(text, 'output.wav')
+    # os.system("aplay output.wav")
+    
     # engine.startLoop(False)
     # engine.iterate()
     # engine.endLoop()
@@ -70,13 +76,13 @@ class Recorder:
         print("Finished recording.")
         self.recording = False
 
-        with wave.open(WAVE_OUTPUT_FILENAME, 'wb') as wf:
+        with wave.open('input.wav', 'wb') as wf:
             wf.setnchannels(CHANNELS)
             wf.setsampwidth(self.p.get_sample_size(FORMAT))
             wf.setframerate(RATE)
             wf.writeframes(b''.join(self.frames))
 
-        result = self.model.transcribe("output.wav", fp16=False)
+        result = self.model.transcribe("input.wav", fp16=False)
         # print("sent message: m", result["text"], "m")
         if result["text"] != "" and result["text"] != " ":
             self.messages.append({"role": "user", "content": result["text"]})
