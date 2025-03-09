@@ -8,7 +8,7 @@ from scipy.io.wavfile import write
 import whisper
 import pyttsx3
 
-# to run: sudo /home/garth/Documents/garth/venv/bin/python /home/garth/Documents/garth/demo.py
+# to run: sudo /home/garth/Documents/smart_speaker/venv/bin/python /home/garth/Documents/smart_speaker/demo.py
 
 # def text_to_speech(text):
 #     print(text)

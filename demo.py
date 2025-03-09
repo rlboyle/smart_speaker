@@ -6,7 +6,7 @@ from anthropic import Anthropic
 # import soundfile as sf
 # from scipy.io.wavfile import write
 import whisper
-# from gtts import gTTS
+from gtts import gTTS
 import pyttsx3
 # from pynput import keyboard
 import keyboard
@@ -20,9 +20,7 @@ CHANNELS = 1
 RATE = 44100
 WAVE_OUTPUT_FILENAME = "output.wav"
 
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[14].id) # change voice
+
 
 def text_to_speech(text):
     print(text)
@@ -30,14 +28,27 @@ def text_to_speech(text):
     # os.system(f"say \"{text}\"") # say works for mac
     # obj = gTTS(text=text, lang='en', slow=False)
     # obj.save("output.mp3")
+    # os.system("aplay output.mp3")
     # os.system("mpg321 output.mp3") # mpg321 should work for raspberry pi
 
     # engine = pyttsx3.init(driverName='espeak')
     # voices = engine.getProperty('voices')
     # engine.setProperty('voice', voices[14].id) # change voice
-    os.system("espeak \"{text}\"")
+    # command = "espeak -ves \"" + text + "\" --stdout | aplay" 
+    # print(command)
+    # os.system(command)
+    # user = os.getenv("SUDO_USER")
+    # os.system(f"sudo -u {user} espeak \"{text}\"")
+    # os.system(f"sudo -u $(logname) espeak \"{text}\"")
     # engine.save_to_file(text, 'output.wav')
     # os.system("aplay output.wav")
+    # engine = pyttsx3.init()
+    # voices = engine.getProperty('voices')
+    # engine.setProperty('voice', voices[15].id) # change voice
+    # engine.say(text)
+    # engine.startloop(False)
+    # engine.iterate()
+    # engine.endLoop()
     
     # engine.startLoop(False)
     # engine.iterate()
@@ -45,6 +56,14 @@ def text_to_speech(text):
     # tts = TTS()
     # tts.speak(text)
     # del(tts)
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[14].id) # change voice
+    engine.say(text)
+    # engine.runAndWait()
+    engine.startLoop(False)
+    engine.iterate()
+    engine.endLoop()
 
 class Recorder:
     def __init__(self):
