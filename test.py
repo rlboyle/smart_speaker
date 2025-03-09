@@ -23,7 +23,10 @@ RATE = 44100
 WAVE_OUTPUT_FILENAME = "output.wav"
 
 def text_to_speech(text):
+    print(text)
     os.system(f"espeak \"{text}\"")
+
+client = Anthropic()
 
 class Recorder:
     def __init__(self):
@@ -85,7 +88,11 @@ class Recorder:
         else:
             text_to_speech("I didn't catch that. Could you repeat?")
 
-        print("Hold shift to speak to Garth...")
+        print("Hold the PTT key to speak to Garth...")
+
+    def callback(self, in_data, frame_count, time_info, status):
+        self.frames.append(in_data)
+        return (None, pyaudio.paContinue)
 
 # Replace with your actual device path
 device_path = "/dev/input/event2"  # Change to your keyboard event
@@ -96,21 +103,23 @@ device = InputDevice(device_path)
 key_pressed = True
 
 # Define the callback function
+recorder = Recorder()
 def on_key(event, key_pressed):
     if event.type == ecodes.EV_KEY and event.value == 1:  # Key press event
         key_event = categorize(event)
-        print(f"Key pressed: {key_event.keycode}")  # Print the key name
+        # print(f"Key pressed: {key_event.keycode}")  # Print the key name
         key_pressed = True
-        Recorder.start_recording()
+        recorder.start_recording()
         
     if event.type == ecodes.EV_KEY and event.value == 0 and key_pressed:  # Key press event
         key_event = categorize(event)
-        print(f"Key released: {key_event.keycode}")  # Print the key name
+        # print(f"Key released: {key_event.keycode}")  # Print the key name
         key_pressed = False
-        Recorder.stop_recording()
+        recorder.stop_recording()
 
 # Listen for events and trigger the callback
 print(f"Listening for key presses on {device_path}...")
+print("Hold the PTT key to talk to Garth")
 for event in device.read_loop():
     on_key(event, key_pressed)
     

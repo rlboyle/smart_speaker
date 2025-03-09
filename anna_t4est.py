@@ -92,7 +92,7 @@ class Recorder:
     def text_to_speech(self, text):
         print(text)
         voices = self.engine.getProperty('voices')
-        self.engine.setProperty('voice', voices[14].id)  # or another valid index
+        self.engine.setProperty('voice', voices[29].id)  # or another valid index
         self.engine.say(text)
         self.engine.runAndWait()   # <-- Use runAndWait() instead of startLoop, iterate, endLoop
 
