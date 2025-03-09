@@ -13,11 +13,8 @@ from gtts import gTTS
 import pyttsx3
 # from pynput import keyboard
 import keyboard
-
 import pyaudio
 import wave
-
-import sys
 
 CHUNK = 8192
 FORMAT = pyaudio.paInt16
@@ -27,7 +24,10 @@ WAVE_OUTPUT_FILENAME = "output.wav"
 
 def text_to_speech(text):
     print(text)
-    os.system(f"espeak \"{text}\"")
+    obj = gTTS(text=text, lang='en', slow=False)
+    obj.save("output.mp3")
+    os.system("mpg123 output.mp3")
+    # os.system(f"espeak \"{text}\"")
 
 client = Anthropic()
 
@@ -100,6 +100,14 @@ class Recorder:
         self.frames.append(in_data)
         return (None, pyaudio.paContinue)
 
+# Replace with your actual device path
+device_path = "/dev/input/event3"  # Change to your keyboard event
+
+# Open the input device
+device = InputDevice(device_path)
+
+key_pressed = True
+
 # Define the callback function
 # recorder = Recorder()
 def on_key(event, key_pressed):
@@ -117,29 +125,11 @@ def on_key(event, key_pressed):
 
 # Listen for events and trigger the callback
 if __name__ == "__main__":
+    print(f"Listening for key presses on {device_path}...")
+    print("Hold the PTT key to talk to Garth")
     recorder = Recorder()
     load_dotenv()
     client = Anthropic()
-    devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
-    device = None
-    print("Searching for PTT button device")
-    for d in devices:
-        # print(device)
-        # print(f"{d.path}: {d.name}")
-        if d.name == "SayoDevice SayoDevice nano":
-            # Open the input device
-            device_path = d.path
-            device = InputDevice(device_path)
-            print(f"Found {device.name} on path {device_path}")
-
-    if not device:
-        print("Unable to find PTT button device")
-        sys.exit(1)
-
-
-    print(f"Listening for key presses on {device_path}...")
-    print("Hold the PTT key to talk to Garth")
-    key_pressed = True
     for event in device.read_loop():
         on_key(event, key_pressed)
     
