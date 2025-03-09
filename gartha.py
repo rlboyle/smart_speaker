@@ -13,8 +13,11 @@ from gtts import gTTS
 import pyttsx3
 # from pynput import keyboard
 import keyboard
+
 import pyaudio
 import wave
+
+import sys
 
 CHUNK = 8192
 FORMAT = pyaudio.paInt16
@@ -27,7 +30,6 @@ def text_to_speech(text):
     obj = gTTS(text=text, lang='en', slow=False)
     obj.save("output.mp3")
     os.system("mpg123 output.mp3")
-    # os.system(f"espeak \"{text}\"")
 
 client = Anthropic()
 
@@ -74,7 +76,7 @@ class Recorder:
             message = client.messages.create(
                     model="claude-3-5-sonnet-latest",
                     max_tokens=256,
-                    system="""You are a helpful smart speaker assistant prototype named Garth.
+                    system="""You are a helpful smart speaker assistant prototype named Gartha.
                         You are an embedded system running on a raspberry pi 5 with 4GB of ram and raspberry pi OS. You were written in python.
                         you are connected to a speaker and a microphone. You are connected to the internet.
                         You were created for a senior design capstone project by Ryan Boyle, Anna Murray, and Victoria Brown at Northwestern University.
@@ -94,42 +96,54 @@ class Recorder:
         else:
             text_to_speech("I didn't catch that. Could you repeat?")
 
-        print("Hold the PTT key to speak to Garth...")
+        print("Hold the PTT key to speak to Gartha...")
 
     def callback(self, in_data, frame_count, time_info, status):
         self.frames.append(in_data)
         return (None, pyaudio.paContinue)
 
-# Replace with your actual device path
-device_path = "/dev/input/event3"  # Change to your keyboard event
-
-# Open the input device
-device = InputDevice(device_path)
-
-key_pressed = True
-
 # Define the callback function
 # recorder = Recorder()
-def on_key(event, key_pressed):
-    if event.type == ecodes.EV_KEY and event.value == 1:  # Key press event
-        key_event = categorize(event)
-        # print(f"Key pressed: {key_event.keycode}")  # Print the key name
-        key_pressed = True
-        recorder.start_recording()
-        
-    if event.type == ecodes.EV_KEY and event.value == 0 and key_pressed:  # Key press event
-        key_event = categorize(event)
-        # print(f"Key released: {key_event.keycode}")  # Print the key name
-        key_pressed = False
-        recorder.stop_recording()
+def on_key(event):
+    if event.type == ecodes.EV_KEY:
+                data = categorize(event)
+                # If the key is KEY_1
+                if data.keycode == "KEY_1":
+                    # Pressed down -> start recording
+                    if data.keystate == data.key_down:
+                        recorder.start_recording()
+                    # Released -> stop recording
+                    elif data.keystate == data.key_up:
+                        recorder.stop_recording()
 
 # Listen for events and trigger the callback
 if __name__ == "__main__":
-    print(f"Listening for key presses on {device_path}...")
-    print("Hold the PTT key to talk to Garth")
-    recorder = Recorder()
-    load_dotenv()
-    client = Anthropic()
-    for event in device.read_loop():
-        on_key(event, key_pressed)
+    try:
+        recorder = Recorder()
+        load_dotenv()
+        client = Anthropic()
+        devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+        device = None
+        print("Searching for PTT button device")
+        for d in devices:
+            # print(device)
+            # print(f"{d.path}: {d.name}")
+            if d.name == "SayoDevice SayoDevice nano":
+                # Open the input device
+                device_path = d.path
+                device = InputDevice(device_path)
+                print(f"Found {device.name} on path {device_path}")
+
+        if not device:
+            print("Unable to find PTT button device")
+            sys.exit(1)
+
+
+        print(f"Listening for key presses on {device_path}...")
+        print("Hold the PTT key to talk to Garth")
+        # key_pressed = True
+        for event in device.read_loop():
+            on_key(event)
+    except KeyboardInterrupt:
+        print("Exiting ...")
     
