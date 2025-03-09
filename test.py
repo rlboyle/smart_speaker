@@ -102,44 +102,46 @@ class Recorder:
 
 # Define the callback function
 # recorder = Recorder()
-def on_key(event, key_pressed):
-    if event.type == ecodes.EV_KEY and event.value == 1:  # Key press event
-        key_event = categorize(event)
-        # print(f"Key pressed: {key_event.keycode}")  # Print the key name
-        key_pressed = True
-        recorder.start_recording()
-        
-    if event.type == ecodes.EV_KEY and event.value == 0 and key_pressed:  # Key press event
-        key_event = categorize(event)
-        # print(f"Key released: {key_event.keycode}")  # Print the key name
-        key_pressed = False
-        recorder.stop_recording()
+def on_key(event):
+    if event.type == ecodes.EV_KEY:
+                data = categorize(event)
+                # If the key is KEY_1
+                if data.keycode == "KEY_1":
+                    # Pressed down -> start recording
+                    if data.keystate == data.key_down:
+                        recorder.start_recording()
+                    # Released -> stop recording
+                    elif data.keystate == data.key_up:
+                        recorder.stop_recording()
 
 # Listen for events and trigger the callback
 if __name__ == "__main__":
-    recorder = Recorder()
-    load_dotenv()
-    client = Anthropic()
-    devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
-    device = None
-    print("Searching for PTT button device")
-    for d in devices:
-        # print(device)
-        # print(f"{d.path}: {d.name}")
-        if d.name == "SayoDevice SayoDevice nano":
-            # Open the input device
-            device_path = d.path
-            device = InputDevice(device_path)
-            print(f"Found {device.name} on path {device_path}")
+    try:
+        recorder = Recorder()
+        load_dotenv()
+        client = Anthropic()
+        devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+        device = None
+        print("Searching for PTT button device")
+        for d in devices:
+            # print(device)
+            # print(f"{d.path}: {d.name}")
+            if d.name == "SayoDevice SayoDevice nano":
+                # Open the input device
+                device_path = d.path
+                device = InputDevice(device_path)
+                print(f"Found {device.name} on path {device_path}")
 
-    if not device:
-        print("Unable to find PTT button device")
-        sys.exit(1)
+        if not device:
+            print("Unable to find PTT button device")
+            sys.exit(1)
 
 
-    print(f"Listening for key presses on {device_path}...")
-    print("Hold the PTT key to talk to Garth")
-    key_pressed = True
-    for event in device.read_loop():
-        on_key(event, key_pressed)
+        print(f"Listening for key presses on {device_path}...")
+        print("Hold the PTT key to talk to Garth")
+        # key_pressed = True
+        for event in device.read_loop():
+            on_key(event)
+    except KeyboardInterrupt:
+        print("Exiting ...")
     
