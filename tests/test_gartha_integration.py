@@ -15,17 +15,6 @@ class TestGarthaIntegration(unittest.TestCase):
     def setUpClass(cls):
         """One-time setup. Could ensure hardware is present, etc."""
         cls.recorder = gartha.Recorder()
-        # cls.audios = {
-        #             'alligator.wav': 'Alligator',
-        #             'alpacas.wav': 'Alpacas',
-        #             'comp_eng.wav': 'computer engineering',
-        #             'great_lakes.wav': 'The great lakes are some of the largest freshwater bodies in the world',
-        #             'happy_lemon.wav': 'happy lemon',
-        #             'project.wav': 'I would rather not be working on this project right now',
-        #             'school.wav': 'School',
-        #             'spring_break.wav': 'Spring Break to start',
-        #             'student.wav': 'student at Northwestern University',
-        #             }
 
     def tearDown(self):
         for fname in ("output.mp3", "input.wav", "output.wav"):
