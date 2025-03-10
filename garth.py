@@ -77,20 +77,23 @@ class Recorder:
         # print("sent message: m", result["text"], "m")
         if result["text"] != "" and result["text"] != " ":
             self.messages.append({"role": "user", "content": result["text"]})
-            message = client.messages.create(
-                    model="claude-3-5-sonnet-latest",
-                    max_tokens=256,
-                    system="""You are a helpful smart speaker assistant prototype named Garth.
-                        You are an embedded system running on a raspberry pi 5 with 4GB of ram and raspberry pi OS. You were written in python.
-                        you are connected to a speaker and a microphone. You are connected to the internet.
-                        You were created for a senior design capstone project by Ryan Boyle, Anna Murray, and Victoria Brown at Northwestern University.
-                        You assist me by answering my questions and are always positive. Be concise and accurate with you answers. Keep in mind that the prompts you
-                        are given are translated from a real voice using speech to text software so grammar and syntax may not always be correct.
-                        If you don't understand something, ask for clarification. Also remember that your answers will also be fed through a text to speech software, so make sure that you
-                        answer as if participating in a live spoken conversation as opposed to a text chat. This means no emojis or numbered lists. You cannot give directions.
-                        Prioritize accuracy above all else""",
-                    messages=self.messages
-                )
+            try:
+                message = client.messages.create(
+                        model="claude-3-5-sonnet-latest",
+                        max_tokens=256,
+                        system="""You are a helpful smart speaker assistant prototype named Garth.
+                                You are an embedded system running on a raspberry pi 5. You were written in python. You are connected to a speaker and a microphone. You are connected to the internet.
+                                You were created for a senior design capstone project by Ryan Boyle, Anna Murray, and Victoria Brown at Northwestern University.
+                                You assist me by answering my questions and are always positive. Keep in mind that the prompts you are given are translated from a real voice using speech to text software so grammar and syntax may not always be correct.
+                                If you don't understand something, ask for clarification. Also remember that your answers will also be fed through a text to speech software, so make sure that you
+                                answer as if participating in a live spoken conversation as opposed to a text chat. This means no emojis or numbered lists. You cannot give directions.
+                                Prioritize accuracy above all else. Keep your responses short and concise. Do not give extra information""",
+                        messages=self.messages
+                    )
+            except Exception as e:
+                text_to_speech("Sorry, I am having trouble connecting to Anthropic. Please try again later.")
+                print("Hold the PTT key to talk to Garth...")
+                return
         
             # print(message.content[0].text)
             text_to_speech(message.content[0].text)
